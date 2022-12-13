@@ -1,0 +1,5 @@
+In file included from test.cpp:1:
+./vector.hpp:4:10: fatal error: 'iostream' file not found
+#include <iostream>
+         ^~~~~~~~~~
+1 error generated.
