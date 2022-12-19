@@ -323,10 +323,6 @@ namespace ft {
 				other._size = tmp_size;
 				other._capacity = tmp_cap;
 				other._allocator = tmp_alloc;
-				// ::swap(_data, other._data);
-				// ::swap(_size, other._size);
-				// ::swap(_capacity, other._capacity);
-				// ::swap(_allocator, other._allocator);
 			}
 
 			private:
