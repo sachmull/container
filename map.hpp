@@ -208,6 +208,7 @@ namespace ft {
 				return node;
 			}
 
+			// Dont use this function use removeRecursive instead
 			bool	pRemove(const key_type& key) {
 				Node*	node = root;
 				Node*	parent = NULL;
@@ -562,7 +563,6 @@ namespace ft {
 			}
 
 			void	erase(iterator pos) {
-				// pRemove(pos->first);
 				removeRecursive(pos->first);
 			}
 
