@@ -1,15 +1,26 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
-#include <functional> //std::less
-#include <queue> // std::queue
+// #include <functional> //std::less
+// #include <queue> // std::queue
 #include <iostream>
+#include <stdio.h>
 
 #include <memory> // std::allocator
+#include <stdexcept> // std::out_of_range
 
 #include "pair.hpp"
 #include "utility.hpp"
+#include "swap.hpp"
+#include "lexicographical_compare.hpp"
 
+// Debugging
+#define PRINTLN(x) std::cout << (x) << std::endl
+#define LINE PRINTLN(__LINE__)
+#define POS std::cout << __FILE__ << ": " << __LINE__ << std::endl
+
+
+// TODO: make this private functions to avoid name-clashing with users macros
 #define EQ(a, b) (comp((a), (b)) == false && comp((b), (a)) == false)
 #define LESS(a, b) (comp((a), (b)) == true)
 #define GREATER(a, b) (comp((b), (a)) == true)
@@ -86,11 +97,11 @@ namespace ft {
 				Node() : data(NULL), left(NULL), right(NULL), parent(NULL), height(0) {}
 			};
 
-			Node*	pSearch(const key_type& key) {
+			Node*	pSearch(const key_type& key) const {
 				return pSearch(key, root);
 			}
 
-			Node*	pSearch(const key_type& key, Node* node) {
+			Node*	pSearch(const key_type& key, Node* node) const {
 				if (node == NULL) {
 					return NULL;
 				}
@@ -129,8 +140,9 @@ namespace ft {
 			bool	removeRecursive(const key_type& key) {
 				size_type	tmp = treeSize;
 				root = removeRecursive(key, root);
-				if (root)
+				if (root) {
 					root = rebalance(root);
+				}
 				endNode.left = root;
 				if (root)
 					root->parent = &endNode;
@@ -159,8 +171,8 @@ namespace ft {
 					if (node->right) {
 						node->right = rebalance(node->right);
 					}
-				} else if (node->left == NULL && node->right == NULL) {	// At this point node is the node to be deleted
-					std::cout << "Node " << node->data->first << " has no children" << std::endl;
+				} else if (node->left == NULL && node->right == NULL) {	// At this point node is the node to be deleted, since the searched key is neither greater nor less
+					// std::cout << "Node " << node->data->first << " has no children" << std::endl;
 					// Node has no child
 					allocator.destroy(node->data);
 					allocator.deallocate(node->data, 1);
@@ -168,7 +180,7 @@ namespace ft {
 					node = NULL;
 					--treeSize;
 				} else if (node->left == NULL) {
-					std::cout << "Node " << node->data->first << " has right child" << std::endl;
+					// std::cout << "Node " << node->data->first << " has right child" << std::endl;
 					// Replace node with node right
 					PARENT_POINTER(node) = node->right;
 					node->right->parent = node->parent;	// This line should be removeable, since parent's pointers are reset one recursion up
@@ -182,7 +194,7 @@ namespace ft {
 
 					return tmp;
 				} else if (node->right == NULL) {
-					std::cout << "Node " << node->data->first << " has left child" << std::endl;
+					// std::cout << "Node " << node->data->first << " has left child" << std::endl;
 					// Replace node with node left
 					PARENT_POINTER(node) = node->left;
 					node->left->parent = node->parent;	// This line should be removeable, since parent's pointers are reset one recursion up
@@ -195,7 +207,7 @@ namespace ft {
 
 					return tmp;
 				} else { // Node has two children
-					std::cout << "Node " << node->data->first << " has two children" << std::endl;
+					// std::cout << "Node " << node->data->first << " has two children" << std::endl;
 					Node*	inOrderSuccessor = node->right;
 					while (inOrderSuccessor->left != NULL) {
 						inOrderSuccessor = inOrderSuccessor->left;
@@ -208,73 +220,74 @@ namespace ft {
 				return node;
 			}
 
+			//	TODO: make sure this function is used nowhere
 			// Dont use this function use removeRecursive instead
-			bool	pRemove(const key_type& key) {
-				Node*	node = root;
-				Node*	parent = NULL;
+			// bool	pRemove(const key_type& key) {
+			// 	Node*	node = root;
+			// 	Node*	parent = NULL;
 
-				// Find the node to be deleted
-				while (node != NULL && !EQ(node->data->first, key)) {
-					// Traverse the tree to the left or right depending on key
-					parent = node;
-					if (LESS(key, node->data->first)) {
-						node = node->left;
-					} else {
-						node = node->right;
-					}
-				}
+			// 	// Find the node to be deleted
+			// 	while (node != NULL && !EQ(node->data->first, key)) {
+			// 		// Traverse the tree to the left or right depending on key
+			// 		parent = node;
+			// 		if (LESS(key, node->data->first)) {
+			// 			node = node->left;
+			// 		} else {
+			// 			node = node->right;
+			// 		}
+			// 	}
 
-				// Node not found
-				if (node == NULL) {
-					return false;
-				}
+			// 	// Node not found
+			// 	if (node == NULL) {
+			// 		return false;
+			// 	}
 
-				// At this point, node is the node to be deleted
-				--treeSize;
+			// 	// At this point, node is the node to be deleted
+			// 	--treeSize;
 
-				// Node has at most one child -> replace node by its only child
-				if (node->left == NULL || node->right == NULL) {
-					Node*	child = (node->left != NULL) ? node->left : node->right;
+			// 	// Node has at most one child -> replace node by its only child
+			// 	if (node->left == NULL || node->right == NULL) {
+			// 		Node*	child = (node->left != NULL) ? node->left : node->right;
 
-					if (node == root) {
-						root = child;
-					} else if (LESS(key, parent->data->first)) {
-						parent->left = child;
-					} else {
-						parent->right = child;
-					}
+			// 		if (node == root) {
+			// 			root = child;
+			// 		} else if (LESS(key, parent->data->first)) {
+			// 			parent->left = child;
+			// 		} else {
+			// 			parent->right = child;
+			// 		}
 
-					allocator.deallocate(node->data, 1);
-					delete node;
-					return true;
-				} else {
-					Node*	inOrderSuccessor = node->right;
-					Node*	inOrderSuccessorParent = node;
+			// 		allocator.deallocate(node->data, 1);
+			// 		delete node;
+			// 		return true;
+			// 	} else {
+			// 		Node*	inOrderSuccessor = node->right;
+			// 		Node*	inOrderSuccessorParent = node;
 
-					while (inOrderSuccessor->left != NULL) {
-						inOrderSuccessorParent = inOrderSuccessor;
-						inOrderSuccessor = inOrderSuccessor->left;
-					}
+			// 		while (inOrderSuccessor->left != NULL) {
+			// 			inOrderSuccessorParent = inOrderSuccessor;
+			// 			inOrderSuccessor = inOrderSuccessor->left;
+			// 		}
 
-					// Copy inorder successors data to current node
-					allocator.destroy(node->data);
-					node->data = inOrderSuccessor->data;
+			// 		// Copy inorder successors data to current node
+			// 		allocator.destroy(node->data);
+			// 		node->data = inOrderSuccessor->data;
 
-					// Delete inorder successor
+			// 		// Delete inorder successor
 
-					// Inorder successor is the deleted nodes right child
-					if (inOrderSuccessor == node->right) {
-						node->right = inOrderSuccessor->right;
-						inOrderSuccessor->right->parent = node;
-						delete inOrderSuccessor;
-					} else {
-						inOrderSuccessorParent->left = inOrderSuccessor->right;
-						inOrderSuccessorParent->left->parent = inOrderSuccessorParent;
-						delete inOrderSuccessor;
-					}
-					return true;
-				}
-			}
+			// 		// Inorder successor is the deleted nodes right child
+			// 		if (inOrderSuccessor == node->right) {
+			// 			node->right = inOrderSuccessor->right;
+			// 			inOrderSuccessor->right->parent = node;
+			// 			delete inOrderSuccessor;
+			// 		} else {
+			// 			inOrderSuccessorParent->left = inOrderSuccessor->right;
+			// 			inOrderSuccessorParent->left->parent = inOrderSuccessorParent;
+			// 			delete inOrderSuccessor;
+			// 		}
+			// 		return true;
+			// 	}
+			// }
 
 			int	height(Node* node) {
 				return (node != NULL) ? node->height : -1;
@@ -297,7 +310,7 @@ namespace ft {
 				left->parent = node->parent;
 
 				node->left = left->right;
-				if (left->right->parent)
+				if (left->right && left->right->parent)
 					left->right->parent = node;
 
 				left->right = node;
@@ -366,7 +379,7 @@ namespace ft {
 				return node;
 			}
 
-			Node*	leftMost(Node* node) {
+			Node*	leftMost(Node* node) const {
 				if (node) {
 					while (node->left) {
 						node = node->left;
@@ -399,7 +412,29 @@ namespace ft {
 					Node*	base;
 
 				public:
+					// Iterator(void* ptr) : base((Node*)ptr) {}
+					Iterator() : base(NULL) {}
 					Iterator(Node* base) : base(base) {}
+					Iterator(const Node* base) : base((Node*)base) {}
+					// template <class Compare2, class Alloc2>
+					// Iterator(const typename ft::map<Key, T, Compare2, Alloc2>::iterator& other) {
+					Iterator(const Iterator& other) {
+						*this = other;
+					}
+
+					// template <class A, class B, class C, class D>
+					// operator	typename map<A, B, C, D>::iterator() {return map<A, B, C, D>::iterator(base); }
+
+					// operator Iterator() const {return Iterator(base); }
+
+					// template <class Compare2, class Alloc2>
+					// Iterator&	operator=(const typename ft::map<Key, T, Compare2, Alloc2>::iterator& other) {
+					Iterator&	operator=(const Iterator& other) {
+						if (this != &other) {
+							base = other.base;
+						}
+						return *this;
+					}
 
 					Iterator&	operator++() {
 						if (!base) {
@@ -422,6 +457,12 @@ namespace ft {
 						return *this;
 					}
 
+					Iterator	operator++(int) {
+						Iterator it = *this;
+						++(*this);
+						return it;
+					}
+
 					Iterator&	operator--() {
 						if (!base) {
 							return *this;
@@ -441,6 +482,12 @@ namespace ft {
 						base = parent;
 
 						return *this;
+					}
+
+					Iterator	operator--(int) {
+						Iterator it = *this;
+						--(*this);
+						return it;
 					}
 
 					value_type&	operator*() {
@@ -481,15 +528,15 @@ namespace ft {
 
 		public:
 			explicit map() : comp(), root(NULL), allocator(), endNode(), treeSize(0) {}
-			explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : comp(comp), allocator(alloc), root(NULL) {}
+			explicit map(const Compare& comp, const Allocator& alloc = Allocator()) : comp(comp), root(NULL), allocator(alloc), endNode(), treeSize(0) {}
 			template <class InputIt>
-			map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator()) : comp(comp), allocator(alloc), root(NULL), treeSize(0) {
+			map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator()) : comp(comp), allocator(alloc), root(NULL), endNode(), treeSize(0) {
 				while (first != last) {
 					insert(*first);
-					**first;
+					++first;
 				}
 			}
-			map(const map& other) { *this = other; }
+			map(const map& other): comp(), root(NULL), allocator(), endNode(), treeSize(0) { *this = other; }
 
 			~map() {
 				while (treeSize) {
@@ -500,6 +547,14 @@ namespace ft {
 			map&	operator=(const map& other) {
 				if (this != &other) {
 					// Erase old content, insert new, reset size, copy comp and allocator
+					while (treeSize) {
+						erase(iterator(root));
+					}
+					for (const_iterator it = other.begin(); it != other.end(); ++it) {
+						insert(*it);
+					}
+					comp = other.comp;
+					allocator = other.allocator;
 				}
 
 				return *this;
@@ -510,9 +565,36 @@ namespace ft {
 			}
 
 
+			// Element access
+			T&	at(const Key& key) {
+				Node*	node = pSearch(key);
+
+				if (node != NULL) {
+					return (node->data->second);
+				}
+
+				throw std::out_of_range("map::at:  key not found");
+			}
+
+			const T&	at(const Key& key) const {
+				Node*	node = pSearch(key);
+
+				if (node != NULL) {
+					return (node->data->second);
+				}
+
+				throw std::out_of_range("map::at:  key not found");
+			}
+
+			T&	operator[](const Key& key) {
+				return (insert(ft::make_pair(key, T())).first->second);
+			}
+
+
 			// Iterators
 			public:
 				typedef	Iterator<value_type>	iterator;
+				typedef	Iterator<const value_type>	const_iterator;
 
 			public:
 				iterator	begin() {
@@ -520,7 +602,15 @@ namespace ft {
 						return iterator(leftMost(root));
 					}
 
-					return iterator(NULL);
+					return iterator((Node*)NULL);
+				}
+
+				const_iterator	begin() const {
+					if (root) {
+						return (const_iterator(leftMost(root)));
+					}
+
+					return const_iterator((Node*)NULL);
 				}
 
 				iterator	end() {
@@ -528,7 +618,15 @@ namespace ft {
 						return iterator(&endNode);
 					}
 
-					return iterator(NULL);
+					return iterator((Node*)NULL);
+				}
+
+				const_iterator	end() const {
+					if (root) {
+						return const_iterator(&endNode);
+					}
+
+					return const_iterator((Node*)NULL);
 				}
 
 			// Capacity
@@ -544,7 +642,14 @@ namespace ft {
 				return allocator.max_size();
 			}
 
+
 			// Modifiers
+			void	clear() {
+				while (treeSize) {
+					erase(root);
+				}
+			}
+
 			ft::pair<iterator, bool>	insert(const value_type& value) {
 				size_type	tmp = treeSize;
 
@@ -560,10 +665,37 @@ namespace ft {
 					return (ft::make_pair(iterator(lastInsert), false));
 				}
 				return (ft::make_pair(iterator(lastInsert), true));
+
+				//	TODO: does this work instead of the if-else-statement
+				// return (ft::make_pair(iterator(lastInsert), tmp == treeSize));
 			}
 
 			void	erase(iterator pos) {
 				removeRecursive(pos->first);
+			}
+
+			void	erase(iterator first, iterator last) {
+				while (first != last) {
+					erase(first++);
+				}
+			}
+
+			size_type	erase(const Key& key) {
+				size_type	tmp = treeSize;
+				removeRecursive(key);
+
+				// Return 1 if a element was removed, 0 otherwise
+				return tmp - treeSize;
+			}
+
+			void	swap(map& other) {
+				// ft::swap(comp, other.comp);
+				// ft::swap(root, other.root);
+				// ft::swap(allocator, other.allocator);
+				// ft::swap(endNode, other.endNode);
+				// ft::swap(treeSize, other.treeSize);
+
+				ft::swap(*this, other);
 			}
 
 
@@ -585,10 +717,89 @@ namespace ft {
 				return end();
 			}
 
+			iterator	lower_bound(const Key& key) {
+				// class TmpCompare : public Compare {
+				// 	bool	operator()(const Key& lhs, const Key& rhs) {
+				// 		return Compare::operator()(rhs, lhs);
+				// 	}
+				// };
+				// Compare tmp = comp;
+				// comp = TmpCompare();
+				// iterator it = find(key);
+				// comp = tmp;
+				// return it;
+
+				Node*	node = root;
+				while (node) {
+					if (comp(node->data->first, key)) {
+						node = node->right;
+					} else {
+						return iterator(node);
+					}
+				}
+
+				return end();
+			}
+
 	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator==(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs) {
+		if (lhs.size() == rhs.size()) {
+			typename map<Key, T, Compare, Alloc>::const_iterator lhs_begin = lhs.begin();
+			typename map<Key, T, Compare, Alloc>::const_iterator rhs_begin = rhs.begin();
+
+			typename map<Key, T, Compare, Alloc>::const_iterator lhs_end = lhs.end();
+			typename map<Key, T, Compare, Alloc>::const_iterator rhs_end = rhs.end();
+
+			while (lhs_begin != lhs_end && rhs_begin != rhs_end) {
+				if (*lhs_begin != *rhs_begin) {
+					return false;
+				}
+				++lhs_begin;
+				++rhs_begin;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator!=(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs) {
+		return !(lhs == rhs);
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator<(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs) {
+		return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator<=(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs) {
+		return (lhs < rhs) || (lhs == rhs);
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator>(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs) {
+		return rhs < lhs;
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator>=(const map<Key, T, Compare, Alloc>& lhs, const map<Key, T, Compare, Alloc>& rhs) {
+		return (lhs > rhs) || (lhs == rhs);
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	void	swap(map<Key, T, Compare, Alloc>& lhs, map<Key, T, Compare, Alloc>& rhs) {
+		lhs.swap(rhs);
+	}
 
 }
 
+
+//	TODO: remove after macros got replaced by functions
 #undef EQ
 #undef LESS
 #undef GREATER

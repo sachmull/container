@@ -8,6 +8,7 @@
 #include "pair.hpp"
 #include "utility.hpp"
 #include <map>
+#include <functional>
 
 #define NS ft
 #define T int
@@ -22,57 +23,29 @@ void	print_vec(NS::vector<T> vec) {
 }
 
 int	main(void) {
-	// std::map<int, int> x;
-	// PRINTLN(sizeof(x));
-	// x.insert(std::make_pair(4, 4));
-	// std::map<int, int>::iterator	i = x.begin();
-	// PRINTLN((*i).first);
 
-	NS::map<int, int> m;
-	m.insert(ft::make_pair(1, 2));
-	m.insert(ft::make_pair(2, 3));
-	m.insert(ft::make_pair(3, 4));
-	m.insert(ft::make_pair(4, 5));
-	m.insert(ft::make_pair(5, 6));
-	m.insert(ft::make_pair(6, 7));
+	std::map<int, int, std::less<int> >::iterator it;
+	std::map<int, int, std::greater<int> > m;
+	it = m.begin();
 
-	// // root is set wrong
-	// auto node = m.root;
-	// PRINTLN(node->left);
-	// PRINTLN(node->right->parent->data->first);
-	// PRINTLN(node->right->right->parent->data->first);
-	// PRINTLN(node->data->first);
-	// PRINTLN(node->left);
-	// PRINTLN(node->right);
-	// PRINTLN(node->right->data->first);
-	// PRINTLN(node->left->data->first);
-	// PRINTLN(m.root->data->first);
-	// PRINTLN(m.root->data->second);
+	// NS::map<int, int>	m;
 
-	// NS::map<int, int>::iterator it = m.begin();
-	// PRINTLN("it");
-	// PRINTLN((*it).first);
+	// m.insert(ft::make_pair(0, 10));
+	// m.insert(ft::make_pair(1, 10));
+	// m.insert(ft::make_pair(2, 10));
+	// PRINTLN(m.lower_bound(1).operator*().first);
 
-	PRINTLN("ROOT");
-	PRINTLN(m.root->data->first);
-	m.erase(m.find(m.root->data->first));
-	PRINTLN("");
+	// for (int i = 0, j = 10; i < 30 * RATIO; ++i, ++j) {
+	// 	m.insert(ft::make_pair(i, j));
+	// }
 
-	for (NS::map<int, int>::iterator it = m.begin(); it != m.end(); it = m.begin()) {
-		PRINTLN(it->first);
-		m.erase(it);
-		// PRINTLN("a");
-	}
-
-	PRINTLN("still still fine");
-	m.find(4);
-
-	// NS::map<int, int>::Node*	n = m.pSearch(3);
-	// PRINTLN(n->data->first);
-	// PRINTLN(n->data->second);
-
-	// m.pRemove(1);
-	// PRINTLN(m.root);
+	// NS::map<int, int>	m2(m.begin(), m.end());
+	// NS::map<int, int>::iterator it = m2.begin();
+	// for (int i = 0; i < 30 * RATIO;++i, it++) {
+	// 	// std::cout << it->first << "	" << it->second << std::endl;
+	// 	v.push_back(it->first);
+	// 	v.push_back(it->second);
+	// }
 
 	return 0;
 }
