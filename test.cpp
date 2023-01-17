@@ -4,11 +4,12 @@
 #include <limits.h>
 #include <string>
 #include <algorithm>
-#include "map.hpp"
+// #include "map.hpp"
 #include "pair.hpp"
 #include "utility.hpp"
 #include <map>
 #include <functional>
+#include "AVLTree.hpp"
 
 #define NS ft
 #define T int
@@ -23,10 +24,26 @@ void	print_vec(NS::vector<T> vec) {
 }
 
 int	main(void) {
+	std::map<int, int> m;
+	m.insert(std::make_pair(1, 2));
+	m.insert(std::make_pair(3, 4));
 
-	std::map<int, int, std::less<int> >::iterator it;
-	std::map<int, int, std::greater<int> > m;
-	it = m.begin();
+	for (std::map<int, int>::const_iterator it = m.begin(); it != m.end(); ++it) {
+		std::cout << it->first << " " << it->second << std::endl;
+	}
+
+	ft::AVLTree<int, int> tree;
+	tree.insert(ft::make_pair(1, 2));
+	tree.insert(ft::make_pair(3, 4));
+
+	for (ft::AVLTree<int, int>::const_iterator it = tree.begin(); it != tree.end(); ++it) {
+		std::cout << it->first << " " << it->second << std::endl;
+	}
+
+
+	// std::map<int, int, std::less<int> >::iterator it;
+	// std::map<int, int, std::greater<int> > m;
+	// it = m.begin();
 
 	// NS::map<int, int>	m;
 
