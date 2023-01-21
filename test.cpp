@@ -13,7 +13,7 @@
 
 #define NS ft
 #define T int
-#define PRINTLN(x) (std::cout << (x) << std::endl)
+// #define PRINTLN(x) (std::cout << (x) << std::endl)
 #define RATIO 10000
 
 void	print_vec(NS::vector<T> vec) {
@@ -24,45 +24,37 @@ void	print_vec(NS::vector<T> vec) {
 }
 
 int	main(void) {
-	std::map<int, int> m;
-	m.insert(std::make_pair(1, 2));
-	m.insert(std::make_pair(3, 4));
+	ft::AVLTree<int, int> m1;
+	m1.insert(ft::make_pair(2, 2));
 
-	for (std::map<int, int>::const_iterator it = m.begin(); it != m.end(); ++it) {
-		std::cout << it->first << " " << it->second << std::endl;
-	}
+	ft::AVLTree<int, int> m2;
+	m2.insert(ft::make_pair(2, 1));
 
-	ft::AVLTree<int, int> tree;
-	tree.insert(ft::make_pair(1, 2));
-	tree.insert(ft::make_pair(3, 4));
+	const ft::AVLTree<int, int>::const_iterator it = m2.begin();
 
-	for (ft::AVLTree<int, int>::const_iterator it = tree.begin(); it != tree.end(); ++it) {
-		std::cout << it->first << " " << it->second << std::endl;
-	}
+	PRINTLN(m1 == m2);
+	PRINTLN(m1 != m2);
+	PRINTLN(m1 < m2);
+	PRINTLN(m1 <= m2);
+	PRINTLN(m1 > m2);
+	PRINTLN(m1 >= m2);
 
+	PRINTLN("\n---------");
 
-	// std::map<int, int, std::less<int> >::iterator it;
-	// std::map<int, int, std::greater<int> > m;
-	// it = m.begin();
+	ft::AVLTree<int, int> a;
+	a.insert(ft::make_pair(2, 2));
 
-	// NS::map<int, int>	m;
+	ft::AVLTree<int, int> b;
+	b.insert(ft::make_pair(2, 1));
 
-	// m.insert(ft::make_pair(0, 10));
-	// m.insert(ft::make_pair(1, 10));
-	// m.insert(ft::make_pair(2, 10));
-	// PRINTLN(m.lower_bound(1).operator*().first);
+	PRINTLN(a == b);
+	PRINTLN(a != b);
+	PRINTLN(a <  b);
+	PRINTLN(a <= b);
+	PRINTLN(a >  b);
+	PRINTLN(a >= b);
 
-	// for (int i = 0, j = 10; i < 30 * RATIO; ++i, ++j) {
-	// 	m.insert(ft::make_pair(i, j));
-	// }
-
-	// NS::map<int, int>	m2(m.begin(), m.end());
-	// NS::map<int, int>::iterator it = m2.begin();
-	// for (int i = 0; i < 30 * RATIO;++i, it++) {
-	// 	// std::cout << it->first << "	" << it->second << std::endl;
-	// 	v.push_back(it->first);
-	// 	v.push_back(it->second);
-	// }
+	swap(a, b);
 
 	return 0;
 }

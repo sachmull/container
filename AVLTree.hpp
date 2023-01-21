@@ -6,6 +6,13 @@
 
 #include "pair.hpp"
 #include "utility.hpp"
+#include "lexicographical_compare.hpp"
+
+// Debugging
+#define PRINTLN(x) std::cout << (x) << std::endl
+#define PRINT(x) std::cout << (x)
+#define LINE PRINTLN(__LINE__)
+#define POS std::cout << __FILE__ << ": " << __LINE__ << std::endl
 
 namespace ft {
 
@@ -38,7 +45,9 @@ namespace ft {
 				allocator.construct(data, value);
 			}
 
-			Node() : data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0) {}
+			// Node() : data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0) {}
+
+			operator	Node<const V>() { return reinterpret_cast<Node<const V>& >(*this); }
 
 			private:
 				Node*	left_most() {
@@ -182,6 +191,26 @@ namespace ft {
 			typedef	Iterator<value_type>				iterator;
 			typedef	Iterator<const value_type>			const_iterator;
 
+		public:
+			class value_compare {
+				public:
+					typedef	bool		result_type;
+					typedef	value_type	first_argument_type;
+					typedef	value_type	second_argument_type;
+
+				protected:
+					Compare	comp;
+
+				public:
+					value_compare() : comp() {}
+					bool	operator()(const value_type& lhs, const value_type& rhs) const {
+						comp(lhs.first, rhs.first);
+					}
+
+				protected:
+					value_compare(Compare c) : comp(c) {}
+			};
+
 		private:
 			Node<value_type>*					_root;
 			size_t								_size;
@@ -190,8 +219,65 @@ namespace ft {
 			std::allocator<Node<value_type> >	_node_allocator;
 
 		public:
+			// Constructor
 			AVLTree() : _root(nullptr), _size(0), _compare(), _allocator() {}
-			AVLTree(const Compare& compare, const Allocator& allocator) : _root(nullptr), _size(0), _compare(compare), _allocator(allocator) {}
+			AVLTree(const Compare& comp, const Allocator& alloc) : _root(nullptr), _size(0), _compare(comp), _allocator(alloc) {}
+			template <class InputIt>
+			AVLTree(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator()) : _root(nullptr), _size(0), _compare(comp), _allocator(alloc) {
+				while (first != last) {
+					insert(*first);
+					++first;
+				}
+			}
+			AVLTree(const AVLTree& other) : _root(nullptr), _size(0), _compare(), _allocator() { *this = other; }
+
+
+			// Destructor
+			~AVLTree() {
+				//
+			}
+
+
+			AVLTree&	operator=(const AVLTree& other) {
+				if (this != &other) {
+					//
+				}
+
+				return *this;
+			}
+
+
+			allocator_type	get_allocator() const {
+				return _allocator;
+			}
+
+
+			// Element access
+			T&	at(const Key& key) {
+				iterator pos = find(key);
+
+				if (pos == end()) {
+					throw std::out_of_range("ft::map at");
+				}
+
+				return pos->second;
+			}
+
+			const T&	at(const Key& key) const {
+				iterator pos = find(key);
+
+				if (pos == end()) {
+					throw std::out_of_range("ft::map const at");
+				}
+
+				return pos->second;
+			}
+
+
+			T&	operator[](const Key& key) {
+				return (insert(ft::make_pair(key, T())).first->second);
+			}
+
 
 			// Iterators
 			iterator	begin() {
@@ -204,7 +290,8 @@ namespace ft {
 
 			const_iterator	begin() const {
 				if (_root) {
-					return const_iterator(_root->left_most());
+					// return const_iterator(_root->left_most());	// why does this not work
+					return iterator(_root->left_most());
 				}
 
 				return end();
@@ -220,13 +307,143 @@ namespace ft {
 
 			const_iterator	end() const {
 				if (_root) {
-					return const_iterator(_root->parent);
+					// return const_iterator(&reinterpret_cast<Node<const ft::pair<const Key, T> >& >(_root->parent));	// works fine
+					// return const_iterator(_root->parent);	// why does this not work
+					return iterator(_root->parent);
 				}
 
 				return const_iterator(nullptr);
 			}
 
-			iterator	find(const Key& key) {
+
+			// Capacity
+			bool	empty() const {
+				return _size == 0;
+			}
+
+			size_type	size() const {
+				return _size;
+			}
+
+			size_type	max_size() const {
+				_allocator.max_size();
+			}
+
+
+			// Modifiers
+			void	clear() {
+				while (_size) {
+					erase(_root);
+				}
+			}
+
+			void	swap(AVLTree& other) {
+				ft::swap(_root, other._root);
+				ft::swap(_size, other._size);
+				ft::swap(_compare, other._compare);
+				ft::swap(_allocator, other._allocator);
+				ft::swap(_node_allocator, other._node_allocator);
+			}
+
+
+			// Lookup
+			size_type	count(const Key& key) const {
+				return !(find(key) == end());
+			}
+
+
+			ft::pair<iterator, iterator>	equal_range(const Key& key) {
+				iterator first = lower_bound(key);
+				if (first == end()) {
+					return ft::make_pair(end(), end());
+				} else if (_compare(key, first->first)) {
+					return ft::make_pair(first, first);
+				} else {
+					return make_pair(first, first._base->right);
+				}
+			}
+
+			ft::pair<const_iterator, const_iterator>	equal_range(const Key& key) const {
+				const_iterator first = lower_bound(key);
+				if (first == end()) {
+					return ft::make_pair(end(), end());
+				} else if (_compare(key, first->first)) {
+					return ft::make_pair(first, first);
+				} else {
+					return make_pair(first, first._base->right);
+				}
+			}
+
+
+			iterator	lower_bound(const Key& key) {
+				Node<value_type>* node = _root;
+
+				while (node) {
+					if (_compare(node->data->first, key)) {
+						node = node->right;
+					} else {
+						return iterator(node);
+					}
+				}
+
+				return end();
+			}
+
+			const_iterator	lower_bound(const Key& key) const {
+				Node<value_type>* node = _root;
+
+				while (node) {
+					if (_compare(node->data->first, key)) {
+						node = node->right;
+					} else {
+						return iterator(node);
+					}
+				}
+
+				return end();
+			}
+
+
+			iterator	upper_bound(const Key& key) {
+				Node<value_type>* node = _root;
+
+				while (node) {
+					if (_compare(key, node->data->first)) {
+						return iterator(node);
+					} else {
+						node = node->right;
+					}
+				}
+
+				return end();
+			}
+
+			const_iterator	upper_bound(const Key& key) const {
+				Node<value_type>* node = _root;
+
+				while (node) {
+					if (_compare(key, node->data->first)) {
+						return iterator(node);
+					} else {
+						node = node->right;
+					}
+				}
+
+				return end();
+			}
+
+
+			// Observers
+			key_compare	key_comp() const {
+				return _compare;
+			}
+
+			value_compare	value_comp() const {
+				return value_compare();
+			}
+
+
+			iterator	find(const Key& key) const {
 				Node<value_type>* node = _root;
 
 				while (node) {
@@ -268,6 +485,8 @@ namespace ft {
 					} else {
 						*next = _node_allocator.allocate(1);
 						_node_allocator.construct(*next, Node<value_type>(value, _allocator));
+						(*next)->parent = node;
+						(less(value.first, node->data->first) ? node->left : node->right) = *next;
 						++_size;
 
 						// rebalance
@@ -300,6 +519,8 @@ namespace ft {
 						((node->parent->left == node) ? node->parent->left : node->parent->right) = node->right;
 					if (node->right) { node->right->parent = node->parent; }
 
+					if (node == _root) { _root = node->right; }
+
 					_allocator.destroy(node->data);
 					_allocator.deallocate(node->data, 1);
 
@@ -311,6 +532,8 @@ namespace ft {
 					if (node->parent)
 						((node->parent->left == node) ? node->parent->left : node->parent->right) = node->left;
 					if (node->left) { node->left->parent = node->parent; }
+
+					if (node == _root) { _root = node->left; }
 
 					_allocator.destroy(node->data);
 					_allocator.deallocate(node->data, 1);
@@ -335,18 +558,69 @@ namespace ft {
 			}
 
 		private:
-			bool	equal(const Key& lhs, const Key& rhs) {
+			bool	equal(const Key& lhs, const Key& rhs) const {
 				return !_compare(lhs, rhs) && !_compare(rhs, lhs);
 			}
 
-			bool	less(const Key& lhs, const Key& rhs) {
+			bool	less(const Key& lhs, const Key& rhs) const {
 				return _compare(lhs, rhs);
 			}
 
-			bool	greater(const Key& lhs, const Key& rhs) {
+			bool	greater(const Key& lhs, const Key& rhs) const {
 				return _compare(rhs, lhs);
 			}
 	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator==(const AVLTree<Key, T, Compare, Alloc>& lhs, const AVLTree<Key, T, Compare, Alloc>& rhs) {
+		if (lhs.size() == rhs.size()) {
+			typename AVLTree<Key, T, Compare, Alloc>::const_iterator	lhs_current = lhs.begin();
+			typename AVLTree<Key, T, Compare, Alloc>::const_iterator	lhs_end = lhs.end();
+			typename AVLTree<Key, T, Compare, Alloc>::const_iterator	rhs_current = rhs.begin();
+
+			while (lhs_current != lhs_end) {
+				if (lhs_current->first != rhs_current->first || lhs_current->second != rhs_current->second) {
+					return false;
+				}
+				++lhs_current;
+				++rhs_current;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator!=(const AVLTree<Key, T, Compare, Alloc>& lhs, const AVLTree<Key, T, Compare, Alloc>& rhs) {
+		return !(lhs == rhs);
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator<(const AVLTree<Key, T, Compare, Alloc>& lhs, const AVLTree<Key, T, Compare, Alloc>& rhs) {
+		return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator<=(const AVLTree<Key, T, Compare, Alloc>& lhs, const AVLTree<Key, T, Compare, Alloc>& rhs) {
+		return !(lhs > rhs);
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator>(const AVLTree<Key, T, Compare, Alloc>& lhs, const AVLTree<Key, T, Compare, Alloc>& rhs) {
+		return rhs < lhs;
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool	operator>=(const AVLTree<Key, T, Compare, Alloc>& lhs, const AVLTree<Key, T, Compare, Alloc>& rhs) {
+		return !(lhs < rhs);
+	}
+
+	template <class Key, class T, class Compare, class Alloc>
+	void	swap(AVLTree<Key, T, Compare, Alloc>& lhs, AVLTree<Key, T, Compare, Alloc>& rhs) {
+		lhs.swap(rhs);
+	}
 }
 
 #endif
