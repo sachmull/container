@@ -89,7 +89,8 @@ namespace ft {
 			typedef	Iterator<value_type>				iterator;
 			typedef	Iterator<const value_type>			const_iterator;
 			typedef	reverse_iterator<iterator>			reverse_iterator;
-			typedef	const reverse_iterator				const_reverse_iterator;
+			// typedef	const reverse_iterator				const_reverse_iterator;
+			typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 		private:
 			pointer			_data;
@@ -295,8 +296,11 @@ namespace ft {
 
 			template <class InputIt>
 			iterator	insert(const_iterator pos, InputIt first, typename enable_if<!is_integral<InputIt>::value, InputIt>::type last) {
+				vector	buf(first, last);
+				iterator	_first = buf.begin();
+				iterator	_last = buf.end();
 				difference_type			pos_idx = pos - _data;
-				if (first == last)
+				if (_first == _last)
 					return iterator(_data + pos_idx);
 				// vector<value_type>	tmp(first, last);
 				// const size_type		offset = tmp.size();
@@ -328,11 +332,11 @@ namespace ft {
 				// Insert new values
 				for (size_type i = 0; i < offset; ++i) {
 					// if (i + pos_idx < _size) {
-						_data[pos_idx + i] = *first; //tmp[i];
+						_data[pos_idx + i] = *_first; //tmp[i];
 					// } else {
 						// _allocator.construct(_data + pos_idx + i, *first);
 					// }
-					++first;
+					++_first;
 				}
 				_size += offset; //tmp._size;
 
