@@ -4,6 +4,10 @@
 #include <functional>
 #include <memory>
 
+#include <vector>
+#include "vector.hpp"
+#include <iostream>
+
 #include "pair.hpp"
 #include "utility.hpp"
 #include "lexicographical_compare.hpp"
@@ -15,9 +19,6 @@
 #define PRINT(x) std::cout << (x)
 #define LINE PRINTLN(__LINE__)
 #define POS std::cout << __FILE__ << ": " << __LINE__ << std::endl
-
-#define BLACK true
-#define RED false
 
 namespace ft {
 
@@ -471,7 +472,7 @@ namespace ft {
 			}
 
 			size_type	max_size() const {
-				_allocator.max_size();
+				return _allocator.max_size();
 			}
 
 
@@ -490,7 +491,13 @@ namespace ft {
 			
 			iterator	insert(iterator pos, const value_type& value) {
 				(void)pos;
-				return insert(value).first;
+				// return insert(value).first;
+				ft::pair<iterator, bool>	result = insert(value);
+				if (result.second == true) {
+					return result.first;
+				} else {
+					return upper_bound(value.first);
+				}
 			}
 
 			template <class InputIt>
@@ -503,13 +510,18 @@ namespace ft {
 
 
 			void	erase(iterator first, iterator last) {
-				iterator	it;
-				while (first != last) {
-					++first;
-					it = first;
-					--first;
-					erase(first);
-					first = it;
+				// iterator	it;
+				// while (first != last) {
+				// 	++first;
+				// 	it = first;
+				// 	--first;
+				// 	erase(first->first);
+				// 	first = it;
+				// }
+
+				std::vector<value_type>	buf(first, last);
+				for (typename std::vector<value_type>::iterator it = buf.begin(); it != buf.end(); ++it) {
+					erase(it->first);
 				}
 			}
 

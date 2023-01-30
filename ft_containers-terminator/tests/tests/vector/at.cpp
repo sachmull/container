@@ -16,9 +16,11 @@
 void vec_test_at()
 {
     SETUP_ARRAYS();
+	PRINT_LINE("fine", 420);
 
     {
         charvector v(64, 'a');
+	PRINT_LINE("fine", 420);
 
         try {
             charvector::reference c = v.at(38);

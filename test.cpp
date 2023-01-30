@@ -17,6 +17,9 @@
 // #define PRINTLN(x) (std::cout << (x) << std::endl)
 #define RATIO 10000
 
+#define _vector ft::vector<int>
+#define _iterator ft::vector<int>::iterator
+
 void	print_map(ft::map<int, int>& m) {
 	std::cout << "size: " << m.size() << std::endl;
 	for (ft::map<int, int>::iterator it = m.begin(); it != m.end(); ++it) {
@@ -24,17 +27,28 @@ void	print_map(ft::map<int, int>& m) {
 	}
 }
 
+void	print_vector(_vector& vec) {
+	std::cout << "size: " << vec.size() << " capacity: " << vec.capacity() << std::endl;
+	for (_iterator it = vec.begin(); it != vec.end(); ++it) {
+		std::cout << *it << std::endl;
+	}
+}
+
+template <class C>
+void	print_container(C& container) {
+	for (typename C::iterator it = container.begin(); it != container.end(); ++it) {
+		std::cout << *it << std::endl;
+	}
+}
+
+
+void	test_func(ft::vector<int>& v) {
+	v.push_back(2);
+}
+
 
 int	main(void) {
-	NS::map<int, int>	m;
-	m.insert(NS::make_pair(1, 2));
-	m.insert(NS::make_pair(2, 2));
-	m.insert(NS::make_pair(3, 2));
-
-	for (NS::map<int, int>::iterator it = --m.end(); it != m.begin();  it--) {
-		PRINTLN(it->first);
-	}
-
+	ft::vector<char>	vec(64, 'a');
 
 	return 0;
 }

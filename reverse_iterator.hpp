@@ -22,7 +22,13 @@ namespace ft {
 			explicit	reverse_iterator(iterator_type x) : current(x) {}
 			// template <class U>
 			reverse_iterator(const reverse_iterator<Iter>& other)  {*this = other; }
-			
+
+			// rit<it<pair> > => rit<it<const pair> > >
+			template <class iter>
+			reverse_iterator(const reverse_iterator<iter>& rit) {
+				current = rit.base();
+			}
+
 
 			// template <class U>
 			reverse_iterator&	operator=(const reverse_iterator<Iter>& other) {
@@ -48,6 +54,9 @@ namespace ft {
 
 			reverse_iterator	operator+(difference_type n) const { return reverse_iterator(current - n); }
 			reverse_iterator	operator-(difference_type n) const { return reverse_iterator(current + n); }
+
+			template <class IterR>
+			difference_type	operator-(reverse_iterator<IterR> n) const { return current - n.current; }
 
 			reverse_iterator&	operator+=(difference_type n) { current - n; return *this; }
 			reverse_iterator&	operator-=(difference_type n) { current + n; return *this; }
