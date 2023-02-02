@@ -46,9 +46,17 @@ void	test_func(ft::vector<int>& v) {
 	v.push_back(2);
 }
 
+class test {
+	private:
+		test() {}
+
+	public:
+		test(int) {}
+};
 
 int	main(void) {
-	ft::vector<char>	vec(64, 'a');
+	ft::vector<char>	vec;
+	vec.assign(4, 'a');
 
 	return 0;
 }

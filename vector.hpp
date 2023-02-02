@@ -13,6 +13,8 @@
 #include "is_integral.hpp"
 #include "swap.hpp"
 
+// #define assign_or_construct(x, y) assign_or_construct((x), (y), __LINE__)
+
 namespace ft {
 
 	template <class T>
@@ -122,6 +124,9 @@ namespace ft {
 			}
 
 			~vector() {
+				// std::cerr << "destructor\n";
+				// std::cerr << "size: " << _size << " cap: " << _capacity << std::endl;
+				// std::cout << "destructor " << _data << std::endl;
 				clear_deallocate();
 			}
 
@@ -143,8 +148,7 @@ namespace ft {
 				reserve(count);
 
 				for (size_type idx = 0; idx < count; ++idx) {
-					_allocator.construct(_data + idx, value);
-					// assign_or_construct(idx, value);
+					assign_or_construct(_data + idx, value);
 					++_size;
 				}
 			}
@@ -155,13 +159,23 @@ namespace ft {
 				clear();
 
 				// make sure there is enough space for the new content
-				difference_type	new_size = ft::distance(first, last);
+				size_type	new_size = (size_type)ft::distance(first, last);
 				reserve(new_size);
 
 				// insert new content
-				for (difference_type idx = 0; idx < new_size; ++idx, ++_size, ++first) {
-					_allocator.construct(_data + idx, *first);
-					// assign_or_construct(idx, *first);
+				for (size_type idx = 0; idx < new_size; ++idx, ++first) {
+					// std::cout << "going in\n";
+					// assign_or_construct(_data + idx, *first);
+					// _allocator.construct(_data + idx, *first);
+
+					++_size;
+					if (idx < _size) {
+						// std::cerr << "construct: " << _data + idx << " line: " << __LINE__ << std::endl;
+						_allocator.construct(_data + idx, *first);
+					} else {
+						// std::cerr << "assign: " << _data + idx << " line: " << __LINE__ << std::endl;
+						_data[idx] = *first;
+					}
 				}
 			}
 
@@ -232,8 +246,7 @@ namespace ft {
 					buf._capacity = new_cap;
 
 					for (size_type idx = 0; idx < _size; ++idx) {
-						_allocator.construct(buf._data + idx, _data[idx]);
-						// buf.assign_or_construct(idx, _data[idx]);
+						buf.assign_or_construct(buf._data + idx, _data[idx]);
 						++buf._size;
 					}
 
@@ -243,7 +256,7 @@ namespace ft {
 
 			size_type	capacity() const { return _capacity; }
 
-			void	clear() { erase(begin(), end()); }
+			void	clear() { if (_size > 0) { erase(begin(), end()); } }
 
 			iterator	insert(const_iterator pos, const value_type& value) {
 				// use an index insead of an iterator, in case a reallocation happens and invalidates all iterators
@@ -257,14 +270,12 @@ namespace ft {
 				// move old values
 				difference_type	insert_idx = _size;
 				while (insert_idx > pos_idx) {
-					_allocator.construct(_data + insert_idx, _data[insert_idx - 1]);
-					// assign_or_construct(insert_idx, _data[insert_idx - 1]);
+					assign_or_construct(_data + insert_idx, _data[insert_idx - 1]);
 					--insert_idx;
 				}
 
 				// insert new value
-				_allocator.construct(_data + insert_idx, value);
-				// assign_or_construct(insert_idx, value);
+				assign_or_construct(_data + insert_idx, value);
 				++_size;
 
 				return iterator(_data + pos_idx);
@@ -280,15 +291,14 @@ namespace ft {
 				// move old values
 				if (_size > 0) {
 					for (ssize_t idx = _size - 1; idx >= pos_idx; --idx) {
-						_allocator.construct(_data + count + idx, _data[idx]);
-						// assign_or_construct(count + idx, _data[idx]);
+						assign_or_construct(_data + count + idx, _data[idx]);
+						// ++_size;
 					}
 				}
 
 				// insert new values
 				for (size_type idx = 0; idx < count; ++idx) {
-					_allocator.construct(_data + pos_idx + idx, value);
-					// assign_or_construct(pos_idx + idx, value);
+					assign_or_construct(_data + pos_idx + idx, value);
 					++_size;
 				}
 
@@ -301,7 +311,9 @@ namespace ft {
 					return iterator((value_type*)pos.base());
 				}
 
-				vector	buf(first, last);
+				// vector	buf(first, last);
+				vector	buf;
+				buf.assign(first, last);
 				difference_type	pos_idx = pos - _data;
 
 				size_type	offset = buf.size();
@@ -316,16 +328,14 @@ namespace ft {
 				// move values to create space to insert into
 				if (_size > 0) {
 					for (difference_type idx = _size - 1; idx >= pos_idx; --idx) {
-						_allocator.construct(_data + offset + idx, _data[idx]);
-						// assign_or_construct(offset + idx, _data[idx]);
+						assign_or_construct(_data + offset + idx, _data[idx]);
 					}
 				}
 
 				// insert new elements
 				iterator	it = buf.begin();
 				for (size_type idx = 0; idx < offset; ++idx) {
-					_allocator.construct(_data + pos_idx + idx, *it);
-					// assign_or_construct(pos_idx + idx, *it);
+					assign_or_construct(_data + pos_idx + idx, *it);
 					++it;
 					++_size;
 				}
@@ -339,11 +349,11 @@ namespace ft {
 				pointer	_end = _data + _size;
 
 				while (next != _end) {
-					_allocator.construct(current, *next);
-					// assign_or_construct(current - _data, *next);
+					assign_or_construct(current, *next);
 					++current;
 					++next;
 				}
+				// std::cerr << "destroy: " << _data + (_size - 1) << "\t" << _data[_size - 1] << std::endl;
 				_allocator.destroy(_data + (_size - 1));
 				--_size;
 
@@ -353,14 +363,15 @@ namespace ft {
 			iterator	erase(iterator first, iterator last) {
 				iterator	_first = first;
 
-				for (iterator it = first; it != last; ++it) {
-					_allocator.destroy(it.base());
-				}
-
 				while (last != end()) {
 					*first = *last;
 					++first;
 					++last;
+				}
+
+				for (iterator it = first; it != last; ++it) {
+					// std::cerr << "destroy: " << it.base() << "\t" << *it << std::endl;
+					_allocator.destroy(it.base());
 				}
 
 				_size -= last - first;
@@ -375,8 +386,7 @@ namespace ft {
 					reserve((_capacity == 0) ? 1 : _capacity * 2);
 				}
 
-				_allocator.construct(_data + _size, tmp);
-				// assign_or_construct(_size, tmp);
+				assign_or_construct(_data + _size, tmp);
 				++_size;
 			}
 
@@ -395,8 +405,7 @@ namespace ft {
 
 					// insert new values
 					while (count > _size) {
-						_allocator.construct(_data + _size, value);
-						// assign_or_construct(_size, value);
+						assign_or_construct(_data + _size, value);
 						++_size;
 					}
 				} else if (count < _size) {
@@ -416,19 +425,25 @@ namespace ft {
 				if (_size > 0) {
 					clear();
 				}
-				if (_data != nullptr) {
+				if (_data != nullptr && _capacity) {
 					_allocator.deallocate(_data, _capacity);
 					_data = nullptr;
 					_capacity = 0;
 				}
 			}
 
-			void	assign_or_construct(size_type pos, const value_type& value) {
-				if (pos < _size) {
-					_data[pos] = value;
+			#undef assign_or_construct
+			void	assign_or_construct(pointer ptr, const value_type& value, __attribute__((unused))int line = -1) {
+				// std::cout << "assign_or_construct - start\n";
+				if (ptr - _data < (difference_type)_size) {
+					// std::cerr << "assign: " << ptr << "\t" << value << " line: " << line << std::endl;
+					*ptr = value;
 				} else {
-					_allocator.construct(_data + pos, value);
+					// std::cerr << "construct: " << ptr << "\t" << value << " line: " << line << std::endl;
+					_allocator.construct(ptr, value);
 				}
+				// _allocator.construct(ptr, value);
+				// std::cout << "assign_or_construct - end\n";
 			}
 	};
 
