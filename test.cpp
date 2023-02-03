@@ -55,8 +55,15 @@ class test {
 };
 
 int	main(void) {
-	ft::vector<char>	vec;
-	vec.assign(4, 'a');
+	std::map<int, int> m;
+	m.insert(std::make_pair(1, 1));
+	m.insert(std::make_pair(2, 2));
+	m.insert(std::make_pair(3, 3));
+
+	std::map<int, int>::iterator it = m.begin();
+	++it;
+	it = m.insert(it, std::make_pair(1, 1));
+	std::cout << it->first << std::endl;
 
 	return 0;
 }

@@ -56,10 +56,10 @@ namespace ft {
 			reverse_iterator	operator-(difference_type n) const { return reverse_iterator(current + n); }
 
 			template <class IterR>
-			difference_type	operator-(reverse_iterator<IterR> n) const { return current - n.current; }
+			difference_type	operator-(reverse_iterator<IterR> n) const { return n.current - current; }
 
-			reverse_iterator&	operator+=(difference_type n) { current - n; return *this; }
-			reverse_iterator&	operator-=(difference_type n) { current + n; return *this; }
+			reverse_iterator&	operator+=(difference_type n) { current -= n; return *this; }
+			reverse_iterator&	operator-=(difference_type n) { current += n; return *this; }
 	};
 
 	template <class Iterator1, class Iterator2>
