@@ -491,17 +491,7 @@ namespace ft {
 			
 			iterator	insert(iterator pos, const value_type& value) {
 				(void)pos;
-				// return insert(value).first;
-				
-				// ft::pair<iterator, bool>	result = insert(value);
-				// if (result.second == true) {
-				// 	return result.first;
-				// } else {
-				// 	return lower_bound(value.first);
-				// }
-
-				insert(value);
-				return lower_bound(value.first);
+				return insert(value).first;
 			}
 
 			template <class InputIt>
