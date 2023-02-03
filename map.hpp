@@ -492,6 +492,8 @@ namespace ft {
 			iterator	insert(iterator pos, const value_type& value) {
 				(void)pos;
 				return insert(value).first;
+				// insert(value);
+				// return lower_bound(value.first);
 			}
 
 			template <class InputIt>
@@ -719,6 +721,7 @@ namespace ft {
 						(less(value.first, node->data->first) ? node->left : node->right) = *next;
 						++_size;
 
+						Node<value_type>*	tmp = *next;
 						// wander from the inserted node back to the root and rebalance
 						do {
 							node = Node<value_type>::rebalance(node);
@@ -731,7 +734,7 @@ namespace ft {
 							node = node->parent;
 						} while (true);
 
-						return ft::make_pair(*next, true);
+						return ft::make_pair(tmp, true);
 					}
 				}
 			}

@@ -39,6 +39,8 @@ void map_test_insert_hint()
         PRINT_PAIR_REF(*it);
 
         it = m.insert(it, NAMESPACE::make_pair(69, "420"));
+		// std::cerr << "fine\n";
+		// std::cerr << (it == m.end()) << std::endl;
 
         PRINT_PAIR_REF(*it);
     }

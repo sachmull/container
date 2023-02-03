@@ -55,15 +55,28 @@ class test {
 };
 
 int	main(void) {
-	std::map<int, int> m;
-	m.insert(std::make_pair(1, 1));
-	m.insert(std::make_pair(2, 2));
-	m.insert(std::make_pair(3, 3));
+	NS::map<int, int> m;
+	NS::map<int, int>::iterator it;
 
-	std::map<int, int>::iterator it = m.begin();
-	++it;
-	it = m.insert(it, std::make_pair(1, 1));
-	std::cout << it->first << std::endl;
+	// it = m.insert(m.end(), NS::make_pair(64, 64));
+	// it = m.insert(m.end(), NS::make_pair(64, 64));
+	// it = m.insert(m.end(), NS::make_pair(100, 100));
+	// it = m.end();
+	// --it;
+	// it = m.insert(it, NS::make_pair(100, 100));
+	// it = m.insert(it, NS::make_pair(69, 69));
+	// std::cout << it._base << std::endl; // ft: it.base() == NULL, std: it->first == 6
+
+	m.insert(NS::make_pair(64, 64));
+	// it = m.insert(NS::make_pair(64, 64)).first;
+	// std::cout << it->first << std::endl;
+	// it = m.insert(NS::make_pair(100, 100)).first;
+	// it = m.end();
+	// --it;
+	m.insert(NS::make_pair(100, 100));
+	it = m.insert(NS::make_pair(69, 69)).first;
+	std::cout << it._base << std::endl; // ft: it.base() == NULL, std: it->first == 6
+	
 
 	return 0;
 }
