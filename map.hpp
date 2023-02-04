@@ -14,12 +14,6 @@
 #include "swap.hpp"
 #include "reverse_iterator.hpp"
 
-// Debugging
-#define PRINTLN(x) std::cout << (x) << std::endl
-#define PRINT(x) std::cout << (x)
-#define LINE PRINTLN(__LINE__)
-#define POS std::cout << __FILE__ << ": " << __LINE__ << std::endl
-
 namespace ft {
 
 	// Node
@@ -50,8 +44,6 @@ namespace ft {
 				allocator.construct(data, value);
 			}
 
-			// Node() : data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0) {}
-
 			operator	Node<const V>() { return reinterpret_cast<Node<const V>& >(*this); }
 
 
@@ -77,6 +69,7 @@ namespace ft {
 			}
 
 			// Red-Black-Tree
+			// unused
 			Node*	get_sibling() {
 				return ((parent->left == this) ? parent->right : parent->left);
 			}
@@ -84,6 +77,7 @@ namespace ft {
 			Node*	get_uncle() {
 				return parent->get_sibling();
 			}
+			// ^ unused
 
 			// AVL-Tree
 			static int	get_height(Node* node) {
@@ -193,7 +187,6 @@ namespace ft {
 			Iterator(Node<V>* base) : _base(base) {}
 			Iterator(const Iterator& other) : _base(nullptr) { *this = other; }
 
-			// operator	Iterator<const V>() { return reinterpret_cast<Iterator<const V>& >(*this); }
 			operator	Iterator<const V>() const { return Iterator<const V>(reinterpret_cast<Node<const V>* >(_base)); }
 
 			Iterator&	operator=(const Iterator& other) {
@@ -408,7 +401,6 @@ namespace ft {
 
 			const_iterator	begin() const {
 				if (_root) {
-					// return const_iterator(_root->left_most());	// why does this not work
 					return iterator(_root->left_most());
 				}
 
@@ -416,24 +408,10 @@ namespace ft {
 			}
 
 			iterator	end() {
-				// if (_root) {
-				// 	return iterator(_root->parent);
-				// }
-
-				// return iterator(nullptr);
-
 				return iterator(&_end);
 			}
 
 			const_iterator	end() const {
-				// if (_root) {
-				// 	// return const_iterator(&reinterpret_cast<Node<const ft::pair<const Key, T> >& >(_root->parent));	// works fine
-				// 	// return const_iterator(_root->parent);	// why does this not work
-				// 	return iterator(_root->parent);
-				// }
-
-				// return const_iterator(nullptr);
-
 				return iterator((Node<value_type>*)&_end);
 			}
 
@@ -479,11 +457,6 @@ namespace ft {
 			// Modifiers
 			void	clear() {
 				while (_size) {
-					// PRINTLN("");
-					// PRINTLN(_root->data->first);
-					// PRINTLN(_size);
-					// for (iterator it = begin(); it != end(); ++it)
-					// 	std::cout << it->first << " " << it->second << std::endl;
 					erase(_root);
 				}
 			}
@@ -492,8 +465,6 @@ namespace ft {
 			iterator	insert(iterator pos, const value_type& value) {
 				(void)pos;
 				return insert(value).first;
-				// insert(value);
-				// return lower_bound(value.first);
 			}
 
 			template <class InputIt>
@@ -506,15 +477,6 @@ namespace ft {
 
 
 			void	erase(iterator first, iterator last) {
-				// iterator	it;
-				// while (first != last) {
-				// 	++first;
-				// 	it = first;
-				// 	--first;
-				// 	erase(first->first);
-				// 	first = it;
-				// }
-
 				std::vector<value_type>	buf(first, last);
 				for (typename std::vector<value_type>::iterator it = buf.begin(); it != buf.end(); ++it) {
 					erase(it->first);
@@ -552,42 +514,15 @@ namespace ft {
 
 
 			ft::pair<iterator, iterator>	equal_range(const Key& key) {
-				// iterator first = lower_bound(key);
-				// if (first == end()) {
-				// 	return ft::make_pair(end(), end());
-				// } else if (_compare(key, first->first)) {
-				// 	return ft::make_pair(first, first);
-				// } else {
-				// 	return make_pair(first, first._base->right);
-				// }
 				return (ft::make_pair(lower_bound(key), upper_bound(key)));
 			}
 
 			ft::pair<const_iterator, const_iterator>	equal_range(const Key& key) const {
-				// const_iterator first = lower_bound(key);
-				// if (first == end()) {
-				// 	return ft::make_pair(end(), end());
-				// } else if (_compare(key, first->first)) {
-				// 	return ft::make_pair(first, first);
-				// } else {
-				// 	return make_pair(first, first._base->right);
-				// }
 				return (ft::make_pair(lower_bound(key), upper_bound(key)));
 			}
 
 
 			iterator	lower_bound(const Key& key) {
-				// Node<value_type>* node = _root;
-
-				// while (node) {
-				// 	if (_compare(node->data->first, key)) {
-				// 		node = node->right;
-				// 	} else {
-				// 		return iterator(node);
-				// 	}
-				// }
-
-				// return end();
 				for (iterator it = begin(); it != end(); ++it) {
 					if (!_compare(it->first, key)) {
 						return it;
@@ -598,17 +533,6 @@ namespace ft {
 			}
 
 			const_iterator	lower_bound(const Key& key) const {
-				// Node<value_type>* node = _root;
-
-				// while (node) {
-				// 	if (_compare(node->data->first, key)) {
-				// 		node = node->right;
-				// 	} else {
-				// 		return iterator(node);
-				// 	}
-				// }
-
-				// return end();
 				for (const_iterator it = begin(); it != end(); ++it) {
 					if (!_compare(it->first, key)) {
 						return it;
@@ -620,17 +544,6 @@ namespace ft {
 
 
 			iterator	upper_bound(const Key& key) {
-				// Node<value_type>* node = _root;
-
-				// while (node) {
-				// 	if (_compare(key, node->data->first)) {
-				// 		return iterator(node);
-				// 	} else {
-				// 		node = node->right;
-				// 	}
-				// }
-
-				// return end();
 				for (iterator it = begin(); it != end(); ++it) {
 					if (_compare(key, it->first)) {
 						return it;
@@ -641,17 +554,6 @@ namespace ft {
 			}
 
 			const_iterator	upper_bound(const Key& key) const {
-				// Node<value_type>* node = _root;
-
-				// while (node) {
-				// 	if (_compare(key, node->data->first)) {
-				// 		return iterator(node);
-				// 	} else {
-				// 		node = node->right;
-				// 	}
-				// }
-
-				// return end();
 				for (const_iterator it = begin(); it != end(); ++it) {
 					if (_compare(key, it->first)) {
 						return it;
@@ -685,7 +587,6 @@ namespace ft {
 					}
 				}
 
-				// return iterator(nullptr);
 				return iterator((Node<value_type>*)&_end);
 			}
 

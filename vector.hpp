@@ -155,31 +155,7 @@ namespace ft {
 
 			template <class InputIt>
 			void	assign(InputIt first, typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last) {
-				// // clear old content
-				// clear();
-
-				// // make sure there is enough space for the new content
-				// size_type	new_size = (size_type)ft::distance(first, last);
-				// reserve(new_size);
-
-				// // insert new content
-				// for (size_type idx = 0; idx < new_size; ++idx, ++first) {
-				// 	// std::cout << "going in\n";
-				// 	// assign_or_construct(_data + idx, *first);
-				// 	// _allocator.construct(_data + idx, *first);
-
-				// 	++_size;
-				// 	if (idx < _size) {
-				// 		std::cerr << "construct: " << _data + idx << " line: " << __LINE__ << std::endl;
-				// 		_allocator.construct(_data + idx, *first);
-				// 	} else {
-				// 		std::cerr << "assign: " << _data + idx << " line: " << __LINE__ << std::endl;
-				// 		_data[idx] = *first;
-				// 	}
-				// }
-
-				// ^ does not work with single pass iterators
-
+				// clear old content
 				clear();
 
 				// store elements in buffer to avoid problems with single pass iterators
@@ -310,14 +286,12 @@ namespace ft {
 				if (_size > 0) {
 					for (ssize_t idx = _size - 1; idx >= pos_idx; --idx) {
 						assign_or_construct(_data + count + idx, _data[idx]);
-						// ++_size; // seg fault
 					}
 				}
 
 				// insert new values
 				for (size_type idx = 0; idx < count; ++idx) {
 					assign_or_construct(_data + pos_idx + idx, value);
-					// ++_size;
 				}
 
 				_size += count;
@@ -330,7 +304,6 @@ namespace ft {
 					return iterator((value_type*)pos.base());
 				}
 
-				// vector	buf(first, last);
 				vector	buf;
 				buf.assign(first, last);
 				difference_type	pos_idx = pos - _data;
@@ -348,12 +321,6 @@ namespace ft {
 				if (_size > 0) {
 					for (difference_type idx = _size - 1; idx >= pos_idx; --idx) {
 						assign_or_construct(_data + offset + idx, _data[idx]);
-						// if (offset + idx < _size) {
-						// 	_data[offset + idx] = _data[idx];
-						// } else {
-						// 	_allocator.construct(_data + offset + idx, _data[idx]);
-						// 	++_size;
-						// }
 					}
 				}
 
@@ -476,7 +443,6 @@ namespace ft {
 					// std::cerr << "construct: " << ptr << "\t" << value << " line: " << line << std::endl;
 					_allocator.construct(ptr, value);
 				}
-				// _allocator.construct(ptr, value);
 				// std::cout << "assign_or_construct - end\n";
 			}
 	};

@@ -53,7 +53,6 @@ namespace ft {
 
 						Iterator	operator+(const difference_type n) const { return _base + n; }
 						Iterator&	operator+=(const difference_type n) { _base += n; return *this; }
-						// Iterator	operator+(const Iterator& rhs) const { return Iterator(_base + rhs._base); }	// This functions appearently does not exist for og
 
 						Iterator	operator-(const difference_type n) const { return _base - n; }
 						Iterator&	operator-=(const difference_type n) { _base -= n; return *this; }
@@ -89,7 +88,6 @@ namespace ft {
 			typedef	Iterator<value_type>				iterator;
 			typedef	Iterator<const value_type>			const_iterator;
 			typedef	reverse_iterator<iterator>			reverse_iterator;
-			// typedef	const reverse_iterator				const_reverse_iterator;
 			typedef	ft::reverse_iterator<const_iterator>	const_reverse_iterator;
 
 		private:
