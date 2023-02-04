@@ -477,8 +477,8 @@ namespace ft {
 
 
 			void	erase(iterator first, iterator last) {
-				std::vector<value_type>	buf(first, last);
-				for (typename std::vector<value_type>::iterator it = buf.begin(); it != buf.end(); ++it) {
+				ft::vector<ft::pair<Key, T> >	buf(first, last);
+				for (typename ft::vector<ft::pair<Key, T> >::iterator it = buf.begin(); it != buf.end(); ++it) {
 					erase(it->first);
 				}
 			}
