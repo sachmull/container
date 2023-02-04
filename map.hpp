@@ -25,14 +25,14 @@ namespace ft {
 		template <class E>
 		friend class Iterator;
 
-		public:
+		private:
 			V*			data;
 			Node*		left;
 			Node*		right;
 			Node*		parent;
 			int			height;
 
-		public:
+		private:
 			// Constructors
 			Node() : data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0) {}
 
@@ -179,7 +179,7 @@ namespace ft {
 			typedef	std::ptrdiff_t	difference_type;
 			typedef	std::bidirectional_iterator_tag	iterator_category;
 
-		public:
+		private:
 			Node<V>*	_base;
 
 		public:
@@ -314,7 +314,7 @@ namespace ft {
 					value_compare(Compare c) : comp(c) {}
 			};
 
-		public:
+		private:
 			Node<value_type>*					_root;
 			size_t								_size;
 			Compare								_compare;
