@@ -155,14 +155,14 @@ namespace ft {
 
 			template <class InputIt>
 			void	assign(InputIt first, typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last) {
-				// clear old content
-				clear();
-
 				// store elements in buffer to avoid problems with single pass iterators
 				vector	buf;
 				for (; first != last; ++first) {
 					buf.push_back(*first);
 				}
+
+				// clear old content
+				clear();
 
 				reserve(buf.size());
 
