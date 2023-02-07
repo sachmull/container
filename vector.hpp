@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <iterator>
+#include <sys/types.h>
 
 #include "reverse_iterator.hpp"
 #include "distance.hpp"
@@ -30,9 +31,9 @@ namespace ft {
 			pointer	_base;
 
 		public:
-			vector_iterator() : _base(nullptr) {}
+			vector_iterator() : _base(NULL) {}
 			vector_iterator(pointer base) : _base(base) {}
-			vector_iterator(const vector_iterator& other) : _base(nullptr) { *this = other; }
+			vector_iterator(const vector_iterator& other) : _base(NULL) { *this = other; }
 			~vector_iterator() {}
 
 			operator	vector_iterator<const T>() const { return _base; }
@@ -98,28 +99,33 @@ namespace ft {
 			size_type		_capacity;
 
 		public:
-			vector() : _data(nullptr), _allocator(), _size(0), _capacity(0) {}
+			vector() : _data(NULL), _allocator(), _size(0), _capacity(0) {}
 
-			explicit vector(const allocator_type& alloc) : _data(nullptr), _allocator(alloc), _size(0), _capacity(0) {}
+			explicit vector(const allocator_type& alloc) : _data(NULL), _allocator(alloc), _size(0), _capacity(0) {}
 
 			explicit vector(size_type count, const value_type& value = value_type(), const allocator_type& alloc = allocator_type())
-			: _data(nullptr), _allocator(alloc), _size(0), _capacity(0) {
+			: _data(NULL), _allocator(alloc), _size(0), _capacity(0) {
 				// use a second vector as buffer, in case a exception is thrown it's destructor will be called
 				vector	buf;
+				buf.reserve(count);
 				buf.resize(count, value);
 				swap(buf);
 			}
 
-			template <class InputIt>
-			vector(InputIt first, InputIt last, const allocator_type& alloc = allocator_type())
-			: _data(nullptr), _allocator(alloc), _size(0), _capacity(0) {
+			template <class InputIt> // do i need enable if?
+			vector(InputIt first, typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last, const allocator_type& alloc = allocator_type())
+			: _data(NULL), _allocator(alloc), _size(0), _capacity(0) {
 				// use a second vector as buffer, in case a exception is thrown it's destructor will be called
 				vector	buf;
 				buf.assign(first, last);
 				swap(buf);
+				// while (first != last) {
+				// 	push_back(*first);
+				// 	++first;
+				// }
 			}
 
-			vector(const vector& other) : _data(nullptr), _allocator(), _size(0), _capacity(0) {
+			vector(const vector& other) : _data(NULL), _allocator(), _size(0), _capacity(0) {
 				*this = other;
 			}
 
@@ -138,6 +144,7 @@ namespace ft {
 					vector	buf(other._allocator);
 					buf.assign(other.begin(), other.end());
 					swap(buf);
+					// assign(other.begin(), other.end());
 				}
 
 				return *this;
@@ -424,9 +431,9 @@ namespace ft {
 				if (_size > 0) {
 					clear();
 				}
-				if (_data != nullptr && _capacity) {
+				if (_data != NULL && _capacity) {
 					_allocator.deallocate(_data, _capacity);
-					_data = nullptr;
+					_data = NULL;
 					_capacity = 0;
 				}
 			}
