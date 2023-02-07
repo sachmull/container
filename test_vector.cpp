@@ -1,6 +1,8 @@
 #include "vector.hpp"
 #include <vector>
 
+#include "swap.hpp"
+
 #include "test_helpers.hpp"
 
 template <class T>
@@ -58,10 +60,11 @@ void	test_fill_constructor() {
 void	test_range_constructor() {
 	std::istringstream	str("1234567890");
 	std::istreambuf_iterator<char>	it(str), end;
-
 	NS::vector<char>	vec(it, end);
-
 	print_vector(vec);
+
+	NS::vector<char>	vec2(vec.begin(), vec.end());
+	print_vector(vec2);
 }
 
 void	test_copy_constructor() {
@@ -98,8 +101,13 @@ void	test_assign() {
 	vec.assign(10, "42");
 
 	vec.assign(++vec.begin(), --vec.end());
-
 	print_vector(vec);
+
+	NS::vector<char>	vec2;
+	std::istringstream	str("1234567890");
+	std::istreambuf_iterator<char>	it(str), end;
+	vec2.assign(it, end);
+	print_vector(vec2);
 }
 
 void	test_get_allocator() {
@@ -266,6 +274,172 @@ void	test_size_and_capacity() {
 	PRINTLN(vec.capacity());
 }
 
+void	test_reserve() {
+	NS::vector<int>	vec;
+
+	vec.reserve(0);
+	if (vec.capacity() != 0) { PRINTLN("capacity should be 0"); }
+
+	vec.reserve(10);
+	if (vec.capacity() != 10) { PRINTLN("capacity should be 10"); }
+
+	vec.reserve(9);
+	if (vec.capacity() != 10) { PRINTLN("capacity should still be 10"); }
+
+	if (vec.begin() != vec.end()) { PRINTLN("begin should be equal to end"); }
+}
+
+void	test_clear() {
+	NS::vector<int>	vec;
+
+	vec.reserve(10);
+	vec.clear();
+	PRINTLN(vec.size());
+	PRINTLN(vec.capacity());
+
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	PRINTLN(vec.size());
+	PRINTLN(vec.capacity());
+
+	vec.clear();
+	PRINTLN(vec.size());
+	PRINTLN(vec.capacity());
+
+	if (vec.begin() != vec.end()) { PRINTLN("after clear begin should equal end"); }
+}
+
+void	test_insert() {
+	NS::vector<int>	vec;
+
+	NS::vector<int>::const_iterator b, e; b = vec.begin(); e = vec.end();
+	vec.insert(e, 1);
+	b = vec.begin(); e = vec.end();
+	vec.insert(e, *b);
+	b = vec.begin(); e = vec.end();
+	vec.insert(e, *b);
+	b = vec.begin(); e = vec.end();
+	print_vector(vec);
+
+	vec.insert(b, b, e);
+	b = vec.begin(); e = vec.end();
+	print_vector(vec);
+
+	vec.insert(b, 3, 42);
+	b = vec.begin(); e = vec.end();
+	vec.insert(e, 3, 42);
+	print_vector(vec);
+
+	NS::vector<char>	vec2;
+	std::istringstream	str("1234567890");
+	std::istreambuf_iterator<char>	it(str), end;
+	vec2.insert(vec2.begin(), it, end);
+	print_vector(vec2);
+}
+
+void	test_erase() {
+	NS::vector<int>	vec;
+
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	vec.push_back(4);
+	vec.push_back(5);
+
+	vec.erase(vec.begin());
+	print_vector(vec);
+	vec.erase(++vec.begin(), vec.end());
+	print_vector(vec);
+}
+
+void	test_push_back() {
+	NS::vector<int>	vec;
+
+	vec.push_back(1);
+	vec.push_back(vec[0]);
+	vec.push_back(vec.at(0));
+	vec.push_back(vec[0]);
+	vec.push_back(*(--vec.end()));
+	print_vector(vec);
+}
+
+void	test_pop_back() {
+	NS::vector<int>	vec;
+
+	vec.push_back(1);
+	vec.push_back(2);
+	vec.push_back(3);
+	vec.push_back(4);
+	vec.push_back(5);
+
+	vec.pop_back();
+	vec.pop_back();
+	vec.pop_back();
+
+	print_vector(vec);
+}
+
+void	test_resize() {
+	NS::vector<int>	vec;
+
+	vec.resize(0, 0);
+	print_vector(vec);
+
+	vec.assign(3, 42);
+	vec.resize(1, 42);
+	print_vector(vec);
+
+	vec.resize(5, 42);
+	print_vector(vec);
+
+	vec.resize(10);
+	print_vector(vec);
+}
+
+void	test_swap() {
+	NS::vector<int>	vec(3, 42);
+	NS::vector<int>	vec2(5, 11);
+	NS::vector<int>	vec3;
+
+	vec.swap(vec2);
+	ft::swap(vec2, vec3);
+
+	print_vector(vec);
+	print_vector(vec2);
+	print_vector(vec3);
+}
+
+void	test_compare_ops() {
+	NS::vector<int>	lhs;
+	NS::vector<int>	rhs;
+
+	lhs.push_back(1);
+	lhs.push_back(2);
+	lhs.push_back(3);
+	lhs.push_back(4);
+
+	rhs.push_back(1);
+	rhs.push_back(2);
+	rhs.push_back(3);
+	rhs.push_back(4);
+
+	PRINTLN(lhs == rhs);
+	PRINTLN(lhs != rhs);
+	PRINTLN(lhs < rhs);
+	PRINTLN(lhs <= rhs);
+	PRINTLN(lhs > rhs);
+	PRINTLN(lhs >= rhs);
+
+	NS::vector<int>	eq(lhs);
+	PRINTLN(lhs == eq);
+	PRINTLN(lhs != eq);
+	PRINTLN(lhs < eq);
+	PRINTLN(lhs <= eq);
+	PRINTLN(lhs > eq);
+	PRINTLN(lhs >= eq);
+}
+
 void	test_all() {
 	TIME(test_typedefs());
 
@@ -298,10 +472,29 @@ void	test_all() {
 
 	TIME(test_size_and_capacity());
 
+	TIME(test_reserve());
+
+	TIME(test_clear());
+
+	TIME(test_insert());
+
+	TIME(test_erase());
+
+	TIME(test_push_back());
+
+	TIME(test_pop_back());
+
+	TIME(test_resize());
+
+	TIME(test_swap());
+
+	TIME(test_compare_ops());
 }
 
 int	main() {
 	TIME(test_all());
+	system("leaks a.out");
+	PRINTLN("FINISHED");
 
 	return 0;
 }

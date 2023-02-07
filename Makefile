@@ -3,4 +3,7 @@ test_vector:
 	@./a.out > ft
 	@c++ test_vector.cpp -D NS=std
 	@./a.out > std
-	@diff std ft
+	@diff std ft > diff
+
+docker:
+	docker run -ti -v $PWD:/app memory-test  bash
