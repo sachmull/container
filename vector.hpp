@@ -1,10 +1,7 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
-#include <iostream>
-
 #include <memory>
-#include <iterator>
 #include <sys/types.h>
 
 #include "reverse_iterator.hpp"
@@ -13,8 +10,6 @@
 #include "lexicographical_compare.hpp"
 #include "is_integral.hpp"
 #include "swap.hpp"
-
-// #define assign_or_construct(x, y) assign_or_construct((x), (y), __LINE__)
 
 namespace ft {
 
@@ -105,7 +100,6 @@ namespace ft {
 
 			explicit vector(size_type count, const value_type& value = value_type(), const allocator_type& alloc = allocator_type())
 			: _data(NULL), _allocator(alloc), _size(0), _capacity(0) {
-				// use a second vector as buffer, in case a exception is thrown it's destructor will be called
 				vector	buf;
 				buf.reserve(count);
 				buf.resize(count, value);
@@ -115,14 +109,9 @@ namespace ft {
 			template <class InputIt> // do i need enable if?
 			vector(InputIt first, typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last, const allocator_type& alloc = allocator_type())
 			: _data(NULL), _allocator(alloc), _size(0), _capacity(0) {
-				// use a second vector as buffer, in case a exception is thrown it's destructor will be called
 				vector	buf;
 				buf.assign(first, last);
 				swap(buf);
-				// while (first != last) {
-				// 	push_back(*first);
-				// 	++first;
-				// }
 			}
 
 			vector(const vector& other) : _data(NULL), _allocator(), _size(0), _capacity(0) {
@@ -130,9 +119,6 @@ namespace ft {
 			}
 
 			~vector() {
-				// std::cerr << "destructor\n";
-				// std::cerr << "size: " << _size << " cap: " << _capacity << std::endl;
-				// std::cout << "destructor " << _data << std::endl;
 				clear_deallocate();
 			}
 
@@ -140,11 +126,9 @@ namespace ft {
 				if (this != &other) {
 					clear_deallocate();
 
-					// use a second vector as buffer, in case a exception is thrown it's destructor will be called
 					vector	buf(other._allocator);
 					buf.assign(other.begin(), other.end());
 					swap(buf);
-					// assign(other.begin(), other.end());
 				}
 
 				return *this;
@@ -162,7 +146,7 @@ namespace ft {
 
 			template <class InputIt>
 			void	assign(InputIt first, typename ft::enable_if<!ft::is_integral<InputIt>::value, InputIt>::type last) {
-				// store elements in buffer to avoid problems with single pass iterators
+				// store in buf
 				vector	buf;
 				for (; first != last; ++first) {
 					buf.push_back(*first);
@@ -335,13 +319,6 @@ namespace ft {
 				iterator	it = buf.begin();
 				for (size_type idx = 0; idx < offset; ++idx) {
 					assign_or_construct(_data + pos_idx + idx, *it);
-					// ++_size;
-					// if (pos_idx + idx < _size) {
-					// 	_data[pos_idx + idx] = *it;
-					// } else {
-					// 	_allocator.construct(_data + pos_idx + idx, *it);
-					// 	++_size;
-					// }
 					++it;
 				}
 				_size += offset;
@@ -359,7 +336,6 @@ namespace ft {
 					++current;
 					++next;
 				}
-				// std::cerr << "destroy: " << _data + (_size - 1) << "\t" << _data[_size - 1] << std::endl;
 				_allocator.destroy(_data + (_size - 1));
 				--_size;
 
@@ -376,7 +352,6 @@ namespace ft {
 				}
 
 				for (iterator it = first; it != last; ++it) {
-					// std::cerr << "destroy: " << it.base() << "\t" << *it << std::endl;
 					_allocator.destroy(it.base());
 				}
 
@@ -442,15 +417,11 @@ namespace ft {
 			#undef assign_or_construct
 			#endif
 			void	assign_or_construct(pointer ptr, const value_type& value, __attribute__((unused))int line = -1) {
-				// std::cout << "assign_or_construct - start\n";
 				if (ptr - _data < (difference_type)_size) {
-					// std::cerr << "assign: " << ptr << "\t" << value << " line: " << line << std::endl;
 					*ptr = value;
 				} else {
-					// std::cerr << "construct: " << ptr << "\t" << value << " line: " << line << std::endl;
 					_allocator.construct(ptr, value);
 				}
-				// std::cout << "assign_or_construct - end\n";
 			}
 	};
 
