@@ -34,11 +34,11 @@ namespace ft {
 
 		private:
 			// Constructors
-			Node() : data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0) {}
+			Node() : data(NULL), left(NULL), right(NULL), parent(NULL), height(0) {}
 
 			template <class Allocator>
 			Node(const V& value, Allocator& allocator)
-			: data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0)
+			: data(NULL), left(NULL), right(NULL), parent(NULL), height(0)
 			{
 				data = allocator.allocate(1);
 				allocator.construct(data, value);
@@ -183,9 +183,9 @@ namespace ft {
 			Node<V>*	_base;
 
 		public:
-			Iterator() : _base(nullptr) {}
+			Iterator() : _base(NULL) {}
 			Iterator(Node<V>* base) : _base(base) {}
-			Iterator(const Iterator& other) : _base(nullptr) { *this = other; }
+			Iterator(const Iterator& other) : _base(NULL) { *this = other; }
 
 			operator	Iterator<const V>() const { return Iterator<const V>(reinterpret_cast<Node<const V>* >(_base)); }
 
@@ -324,16 +324,16 @@ namespace ft {
 
 		public:
 			// Constructor
-			map() : _root(nullptr), _size(0), _compare(), _allocator(), _node_allocator(), _end() {}
-			map(const Compare& comp, const Allocator& alloc) : _root(nullptr), _size(0), _compare(comp), _allocator(alloc), _node_allocator(), _end() {}
+			map() : _root(NULL), _size(0), _compare(), _allocator(), _node_allocator(), _end() {}
+			map(const Compare& comp, const Allocator& alloc) : _root(NULL), _size(0), _compare(comp), _allocator(alloc), _node_allocator(), _end() {}
 			template <class InputIt>
-			map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator()) : _root(nullptr), _size(0), _compare(comp), _allocator(alloc), _node_allocator(), _end() {
+			map(InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator()) : _root(NULL), _size(0), _compare(comp), _allocator(alloc), _node_allocator(), _end() {
 				while (first != last) {
 					insert(*first);
 					++first;
 				}
 			}
-			map(const map& other) : _root(nullptr), _size(0), _compare(), _allocator(), _node_allocator(), _end() { *this = other; }
+			map(const map& other) : _root(NULL), _size(0), _compare(), _allocator(), _node_allocator(), _end() { *this = other; }
 
 
 			// Destructor
@@ -594,7 +594,7 @@ namespace ft {
 				Node<value_type>*	node = _root;
 				Node<value_type>**	next;
 
-				if (_root == nullptr) {
+				if (_root == NULL) {
 					_root = _node_allocator.allocate(1);
 					_node_allocator.construct(_root, Node<value_type>(value, _allocator));
 					++_size;
@@ -647,7 +647,7 @@ namespace ft {
 				if (!node->left && !node->right) {	// no children
 					parent = node->parent;
 					if (node->parent)
-						((node->parent->left == node) ? node->parent->left : node->parent->right) = nullptr;
+						((node->parent->left == node) ? node->parent->left : node->parent->right) = NULL;
 					
 					_allocator.destroy(node->data);
 					_allocator.deallocate(node->data, 1);
@@ -710,7 +710,7 @@ namespace ft {
 					} while (true);
 				}
 
-				if (!_size) { _root = nullptr; }
+				if (!_size) { _root = NULL; }
 			}
 
 		private:
