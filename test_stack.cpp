@@ -25,8 +25,11 @@ void	test_typedefs() {
 	container.pop_back();
 	NS::stack<int>::value_type		value;
 	NS::stack<int>::size_type		st;
+	(void)st;
 	NS::stack<int>::reference		r = value;
+	(void)r;
 	NS::stack<int>::const_reference	cr = value;
+	(void)cr;
 }
 
 void	test_constructors() {
@@ -70,6 +73,7 @@ void	test_top() {
 
 	const NS::stack<int> cs(s);
 	const int& i = cs.top();
+	(void)i;
 }
 
 void	test_pop() {
@@ -131,7 +135,6 @@ void	test_all() {
 
 int	main() {
 	TIME(test_all());
-	system("leaks a.out");
 	PRINTLN("FINISHED");
 
 	return 0;

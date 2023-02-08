@@ -24,6 +24,7 @@ void	print_vector(NS::vector<T>&	vec, std::string file, int line) {
 void	test_typedefs() {
 	NS::vector<std::string>::value_type	val	= "this is a string";
 	std::allocator<std::string>	alloc = NS::vector<std::string>::allocator_type();
+	(void)alloc;
 	NS::vector<std::string>::size_type	st = 0; // --st should still be > 0
 	--st;
 	if (st < 0) { PRINTLN("size_type should be unsigned"); }
@@ -31,13 +32,21 @@ void	test_typedefs() {
 	--dt;
 	if (dt > 0) { PRINTLN("difference_type should be signed"); }
 	NS::vector<std::string>::reference r = val;
+	(void)r;
 	NS::vector<std::string>::const_reference cr = val;
+	(void)cr;
 	NS::vector<std::string>::pointer p = &val;
+	(void)p;
 	NS::vector<std::string>::const_pointer cp = &val;
+	(void)cp;
 	NS::vector<std::string>::iterator	it;
+	(void)it;
 	NS::vector<std::string>::const_iterator	cit;
+	(void)cit;
 	NS::vector<std::string>::reverse_iterator	rit;
+	(void)rit;
 	NS::vector<std::string>::const_reverse_iterator	crit;
+	(void)crit;
 }
 
 
@@ -112,6 +121,7 @@ void	test_assign() {
 
 void	test_get_allocator() {
 	NS::vector<int>::allocator_type	at = NS::vector<int>().get_allocator();
+	(void)at;
 }
 
 void	test_at() {
@@ -128,12 +138,13 @@ void	test_at() {
 	// PS: instead of this construct one could also just cast or copy construct into a const vector
 	struct need_const {
 		static void	give_me_const(const NS::vector<int> vec) {
-			for (int i = 0; i < vec.size(); ++i) {
+			for (NS::vector<int>::size_type i = 0; i < vec.size(); ++i) {
 				PRINTLN(vec.at(i));
 			}
 
 			try {
 				int i = vec.at(vec.size());
+				(void)i;
 			} catch (std::out_of_range e) {
 				PRINTLN(e.what());
 			}
@@ -166,6 +177,7 @@ void	test_front() {
 	const NS::vector<int>	vec2(vec);
 	if (vec2.front() != 1) { PRINTLN("front should be equal to 1"); }
 	const int& i = vec2.front();
+	(void)i;
 }
 
 void	test_back() {
@@ -179,6 +191,7 @@ void	test_back() {
 	const NS::vector<int>	vec2(vec);
 	if (vec2.back() != 3) { PRINTLN("back should be equal to 3"); }
 	const int& i = vec2.back();
+	(void)i;
 }
 
 void	test_data() {
@@ -195,6 +208,7 @@ void	test_data() {
 	const NS::vector<int>	vec2(vec);
 	if (vec2.data() != &(vec2[0])) { PRINTLN("data should return a pointer to the underlying array"); }
 	const int* ptr = vec2.data();
+	(void)ptr;
 }
 
 void	test_begin_end() {
@@ -207,7 +221,7 @@ void	test_begin_end() {
 	vec.push_back(3);
 
 	if (vec.begin().base() != vec.data()) { PRINTLN("begin should point to the begin of the array"); }
-	if (vec.end() - vec.begin() != vec.size()) { PRINTLN("difference between begin and end should be equal to size"); }
+	if (vec.end() - vec.begin() != (NS::vector<int>::difference_type)vec.size()) { PRINTLN("difference between begin and end should be equal to size"); }
 
 	const NS::vector<int>	vec2(vec);
 	NS::vector<int>::const_iterator	cit;
@@ -493,7 +507,6 @@ void	test_all() {
 
 int	main() {
 	TIME(test_all());
-	system("leaks a.out");
 	PRINTLN("FINISHED");
 
 	return 0;

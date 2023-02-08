@@ -574,7 +574,23 @@ namespace ft {
 			}
 
 
-			iterator	find(const Key& key) const {
+			iterator	find(const Key& key) {
+				Node<value_type>* node = _root;
+
+				while (node) {
+					if (less(key, node->data->first)) {
+						node = node->left;
+					} else if (greater(key, node->data->first)) {
+						node = node->right;
+					} else {
+						return iterator(node);
+					}
+				}
+
+				return iterator((Node<value_type>*)&_end);
+			}
+
+			const_iterator	find(const Key& key) const {
 				Node<value_type>* node = _root;
 
 				while (node) {

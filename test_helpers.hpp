@@ -4,8 +4,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <sstream>
-
-#include "is_const.hpp"
+#include <iostream>
 #include <type_traits>
 
 #ifndef NS
