@@ -1,5 +1,5 @@
 # Container
-Partly reimplementation of the STL.
+Partly reimplementation of the STL (C++ 98).
 
 ## Usage
 To use simply include the container you need and start, the interfaces are the same as the ones used in the std. </br>
