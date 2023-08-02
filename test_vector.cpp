@@ -130,6 +130,7 @@ void	test_at() {
 	int i = vec.at(0);
 	try {
 		i = vec.at(vec.size());
+    PRINTLN(i);
 	} catch (std::out_of_range e) {
 		PRINTLN(e.what());
 	}
@@ -159,6 +160,7 @@ void	test_array_like_access() {
 	vec.resize(2);
 
 	int i = vec[2];
+  PRINTLN(i);
 	vec[2] = 20;
 	if (vec[2] != 20) { PRINTLN("vector's content should be modifiable through the []-operator"); }
 
